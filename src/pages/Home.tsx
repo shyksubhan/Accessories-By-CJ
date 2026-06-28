@@ -1,8 +1,20 @@
+// src/pages/Home.tsx
+// Replace path: Acc-by-Cj/src/pages/Home.tsx
+// Updated: hero right column now uses CjLogoSVG + ProductVisuals from design
+
 import { useEffect, useState, useRef } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, ChevronRight, Shield, Truck, RefreshCw, Headphones, Zap, Star } from "lucide-react";
+import { ArrowRight, ChevronRight, Shield, Truck, RefreshCw, Headphones, Zap, Star, Sparkles } from "lucide-react";
 import ProductCard from "@/components/ProductCard";
 import { productsApi, type ApiProduct } from "@/lib/api";
+import { CjLogoSVG } from "@/components/CjLogo";
+import {
+  PowerBankVisual,
+  ChargerVisual,
+  BraidedCableVisual,
+  ChargingPadVisual,
+} from "@/components/ProductVisuals";
+import { SpecsModal } from "@/components/SpecsModal";
 
 /* ─── Category data ─── */
 const CATS = [
@@ -51,37 +63,54 @@ function StatNumber({ value, suffix = "", label }: { value: number; suffix?: str
   );
 }
 
+/* ─── Showcase product mini-tiles ─── */
+const showcaseItems = [
+  { id: "power-bank",    label: "Power Bank",  Visual: PowerBankVisual,   pos: "absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20" },
+  { id: "gan-charger",   label: "GaN Charger", Visual: ChargerVisual,     pos: "absolute top-4 right-8 z-10" },
+  { id: "braided-cable", label: "Cable",       Visual: BraidedCableVisual, pos: "absolute bottom-4 right-4 z-10" },
+  { id: "charging-pad",  label: "Wireless Pad",Visual: ChargingPadVisual, pos: "absolute bottom-6 left-4 z-10" },
+];
+
 export default function Home() {
   const [featuredProducts, setFeaturedProducts] = useState<ApiProduct[]>([]);
   const [loadingProducts, setLoadingProducts] = useState(true);
+  const [activeShowcase, setActiveShowcase] = useState("power-bank");
+  const [specsOpen, setSpecsOpen] = useState(false);
 
   useEffect(() => {
     productsApi.getAll()
-      .then((all) => {
-        // Show first 4 products regardless of badge
-        setFeaturedProducts(all.slice(0, 4));
-      })
+      .then((all) => setFeaturedProducts(all.slice(0, 4)))
       .catch(() => {})
       .finally(() => setLoadingProducts(false));
   }, []);
 
+  // Auto-rotate showcase
+  useEffect(() => {
+    const ids = showcaseItems.map(s => s.id);
+    const interval = setInterval(() => {
+      setActiveShowcase(prev => {
+        const idx = ids.indexOf(prev);
+        return ids[(idx + 1) % ids.length];
+      });
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const activeProduct = showcaseItems.find(s => s.id === activeShowcase);
+
   return (
     <div className="min-h-screen bg-white overflow-x-hidden">
       {/* ══════════════════════════════════════════════
-          HERO — Split Layout with 3D card stack
+          HERO — Cinematic Dark Layout
       ══════════════════════════════════════════════ */}
       <section className="relative min-h-screen flex items-center bg-[#020817]">
         {/* Mesh gradient */}
         <div className="absolute inset-0">
           <div className="absolute top-0 left-0 w-full h-full opacity-60"
-            style={{
-              background: "radial-gradient(ellipse 80% 60% at 20% 30%, rgba(26,86,219,0.35) 0%, transparent 70%)",
-            }}
+            style={{ background: "radial-gradient(ellipse 80% 60% at 20% 30%, rgba(26,86,219,0.35) 0%, transparent 70%)" }}
           />
           <div className="absolute top-0 right-0 w-full h-full opacity-40"
-            style={{
-              background: "radial-gradient(ellipse 60% 50% at 80% 70%, rgba(59,130,246,0.2) 0%, transparent 70%)",
-            }}
+            style={{ background: "radial-gradient(ellipse 60% 50% at 80% 70%, rgba(59,130,246,0.2) 0%, transparent 70%)" }}
           />
           {/* Dot grid */}
           <div
@@ -93,8 +122,27 @@ export default function Home() {
           />
         </div>
 
+        {/* Floating ambient particles */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          {Array.from({ length: 18 }).map((_, i) => (
+            <div
+              key={i}
+              className="absolute rounded-full bg-blue-400/20 animate-particle"
+              style={{
+                left: `${(i * 37 + 11) % 100}%`,
+                top: `${(i * 53 + 7) % 100}%`,
+                width: `${2 + (i % 4)}px`,
+                height: `${2 + (i % 4)}px`,
+                animationDelay: `${i * 200}ms`,
+                animationDuration: `${5 + (i % 4)}s`,
+              }}
+            />
+          ))}
+        </div>
+
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full py-24 lg:py-32">
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+
             {/* Left — Text */}
             <div>
               {/* Pill badge */}
@@ -151,61 +199,88 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Right — Logo + floating cards */}
-            <div className="relative flex items-center justify-center">
-              {/* Outer glow ring */}
-              <div className="absolute w-72 h-72 rounded-full bg-[#1A56DB]/20 blur-3xl animate-pulse" />
+            {/* ── Right — Cinematic Product Showcase (from Design) ── */}
+            <div className="relative flex items-center justify-center h-[420px] sm:h-[480px]">
 
-              {/* Spinning dashed ring */}
-              <div className="absolute w-64 h-64 rounded-full border-2 border-dashed border-[#1A56DB]/30 animate-spin-slow" />
-              <div className="absolute w-52 h-52 rounded-full border border-[#60A5FA]/20 animate-spin-reverse" />
+              {/* Ambient glow orb */}
+              <div className="absolute w-72 h-72 rounded-full bg-blue-600/10 blur-3xl animate-pulse-glow pointer-events-none" />
 
-              {/* Center logo */}
-              <div className="relative z-10 w-44 h-44 rounded-3xl bg-white/8 backdrop-blur-xl border border-white/15 flex items-center justify-center shadow-[0_24px_64px_rgba(0,0,0,0.4)] animate-logo-float">
-                <img
-                  src="/logo.png"
-                  alt="Accessories By CJ"
-                  className="w-32 h-32 object-contain drop-shadow-2xl"
-                />
+              {/* Energy rotation rings */}
+              <div className="absolute w-[340px] h-[340px] rounded-full border border-dashed border-blue-500/20 animate-energy-rotate-slow pointer-events-none" />
+              <div className="absolute w-[290px] h-[290px] rounded-full border border-double border-blue-400/10 animate-energy-rotate-fast pointer-events-none" />
+              <div className="absolute w-64 h-64 rounded-full border-2 border-dashed border-[#1A56DB]/25 animate-spin-slow pointer-events-none" />
+              <div className="absolute w-52 h-52 rounded-full border border-[#60A5FA]/15 animate-spin-reverse pointer-events-none" />
+
+              {/* ── CENTER: CjLogoSVG (replaces old img logo) ── */}
+              <div className="relative z-10 flex flex-col items-center justify-center animate-logo-float">
+                <div className="w-44 h-44 rounded-3xl bg-slate-950/80 backdrop-blur-xl border border-white/10 flex items-center justify-center shadow-[0_24px_64px_rgba(0,0,0,0.4)]">
+                  <CjLogoSVG size={120} glow={true} />
+                </div>
+                <span className="mt-3 font-podium text-white/60 text-[10px] tracking-[0.3em] uppercase select-none">
+                  AUTHENTIC SEAL
+                </span>
               </div>
 
-              {/* Floating feature cards */}
-              <div className="absolute -top-4 -left-8 bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl px-4 py-3 shadow-xl animate-float-1">
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-xl bg-[#1A56DB] flex items-center justify-center">
-                    <Zap className="w-4 h-4 text-white" />
-                  </div>
-                  <div>
-                    <p className="text-xs font-bold text-white">65W GaN</p>
-                    <p className="text-[10px] text-white/50">Fast Charging</p>
-                  </div>
+              {/* ── Floating product SVG visuals from design ── */}
+              {/* Top-right: Charger */}
+              <div
+                className="absolute top-6 right-6 z-20 cursor-pointer animate-float-1 opacity-80 hover:opacity-100 transition-opacity"
+                onClick={() => setActiveShowcase("gan-charger")}
+              >
+                <div className={`p-1 rounded-xl transition-all duration-300 ${activeShowcase === "gan-charger" ? "ring-1 ring-blue-400/50 bg-blue-500/10" : ""}`}>
+                  <ChargerVisual />
                 </div>
               </div>
 
-              <div className="absolute -bottom-4 -right-8 bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl px-4 py-3 shadow-xl animate-float-2">
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-xl bg-[#10B981] flex items-center justify-center">
-                    <Star className="w-4 h-4 text-white" />
-                  </div>
-                  <div>
-                    <p className="text-xs font-bold text-white">Premium</p>
-                    <p className="text-[10px] text-white/50">Quality Tested</p>
-                  </div>
+              {/* Bottom-right: Cable */}
+              <div
+                className="absolute bottom-2 right-2 z-20 cursor-pointer animate-float-2 opacity-70 hover:opacity-100 transition-opacity"
+                onClick={() => setActiveShowcase("braided-cable")}
+              >
+                <div className={`p-1 rounded-xl transition-all duration-300 ${activeShowcase === "braided-cable" ? "ring-1 ring-blue-400/50 bg-blue-500/10" : ""}`}>
+                  <BraidedCableVisual />
                 </div>
               </div>
 
-              <div className="absolute top-1/2 -right-12 -translate-y-1/2 bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl px-4 py-3 shadow-xl animate-float-1" style={{ animationDelay: "0.5s" }}>
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-xl bg-[#8B5CF6] flex items-center justify-center">
-                    <Headphones className="w-4 h-4 text-white" />
-                  </div>
-                  <div>
-                    <p className="text-xs font-bold text-white">ANC</p>
-                    <p className="text-[10px] text-white/50">Earbuds</p>
-                  </div>
+              {/* Bottom-left: Wireless Pad */}
+              <div
+                className="absolute bottom-4 left-2 z-20 cursor-pointer animate-float-1 opacity-70 hover:opacity-100 transition-opacity"
+                style={{ animationDelay: "0.8s" }}
+                onClick={() => setActiveShowcase("charging-pad")}
+              >
+                <div className={`p-1 rounded-xl transition-all duration-300 ${activeShowcase === "charging-pad" ? "ring-1 ring-blue-400/50 bg-blue-500/10" : ""}`}>
+                  <ChargingPadVisual />
+                </div>
+              </div>
+
+              {/* Active product info HUD card */}
+              {activeProduct && (
+                <div className="absolute left-0 top-4 z-30 max-w-[180px] bg-slate-950/80 border border-blue-500/30 rounded-2xl p-3 shadow-2xl backdrop-blur-md">
+                  <span className="text-[8px] uppercase tracking-widest text-blue-400 font-mono font-bold block mb-1">
+                    {activeProduct.label}
+                  </span>
+                  <button
+                    onClick={() => setSpecsOpen(true)}
+                    className="w-full bg-blue-500/10 hover:bg-blue-500/20 text-blue-300 border border-blue-400/30 py-1 rounded-lg text-[9px] uppercase font-mono tracking-widest transition-all flex items-center justify-center gap-1"
+                  >
+                    <Sparkles className="w-3 h-3" />
+                    View Specs
+                  </button>
+                </div>
+              )}
+
+              {/* Trust badge (lg only) */}
+              <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 hidden lg:flex items-center gap-3 bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl px-4 py-3 shadow-xl whitespace-nowrap">
+                <div className="w-8 h-8 rounded-xl bg-[#1A56DB] flex items-center justify-center">
+                  <Zap className="w-4 h-4 text-white" />
+                </div>
+                <div>
+                  <p className="text-xs font-bold text-white">GaN V Technology</p>
+                  <p className="text-[10px] text-white/50">Next-Gen Fast Charging</p>
                 </div>
               </div>
             </div>
+
           </div>
         </div>
 
@@ -256,9 +331,7 @@ export default function Home() {
                 className="group relative overflow-hidden rounded-2xl bg-white border border-blue-100 p-6 flex flex-col items-center text-center hover:shadow-[0_16px_40px_rgba(26,86,219,0.12)] hover:-translate-y-1 transition-all duration-300"
                 style={{ animationDelay: `${i * 0.08}s` }}
               >
-                {/* Hover fill */}
                 <div className="absolute inset-0 bg-gradient-to-br from-[#EFF6FF] to-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-
                 <div className="relative z-10">
                   <div className="w-16 h-16 rounded-2xl bg-[#EFF6FF] group-hover:bg-[#1A56DB] flex items-center justify-center mb-4 transition-colors duration-300 shadow-sm">
                     <span className="text-3xl group-hover:scale-110 transition-transform duration-300">
@@ -271,7 +344,6 @@ export default function Home() {
                   </h3>
                   <p className="text-xs text-[#94A3B8] mt-1">{cat.desc}</p>
                 </div>
-
                 <ChevronRight className="relative z-10 w-4 h-4 text-[#BFDBFE] group-hover:text-[#1A56DB] mt-3 group-hover:translate-x-1 transition-all duration-300" />
               </Link>
             ))}
@@ -366,28 +438,24 @@ export default function Home() {
                 title: "Fast Nationwide Delivery",
                 desc: "Lahore: 1–2 days. Rest of Pakistan: 2–5 days.",
                 color: "from-[#EFF6FF] to-[#DBEAFE]",
-                accent: "#1A56DB",
               },
               {
                 icon: "🛡️",
                 title: "3-Month Warranty",
                 desc: "All sealed accessories covered for manufacturing defects.",
                 color: "from-[#F0FDF4] to-[#DCFCE7]",
-                accent: "#16a34a",
               },
               {
                 icon: "↩️",
                 title: "7-Day Easy Returns",
                 desc: "Not happy? Return it hassle-free within 7 days.",
                 color: "from-[#FFF7ED] to-[#FED7AA]",
-                accent: "#ea580c",
               },
               {
                 icon: "💬",
                 title: "WhatsApp Support",
                 desc: "Real humans, real answers — chat us anytime.",
                 color: "from-[#F5F3FF] to-[#EDE9FE]",
-                accent: "#7c3aed",
               },
             ].map((card) => (
               <div
@@ -412,17 +480,14 @@ export default function Home() {
       <section className="py-20 bg-[#EFF6FF]/50">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-[#020817] via-[#0F1629] to-[#1A2744] text-center px-8 py-16">
-            {/* Decorative blobs */}
             <div className="absolute -top-16 -left-16 w-64 h-64 bg-[#1A56DB]/20 rounded-full blur-3xl" />
             <div className="absolute -bottom-16 -right-16 w-64 h-64 bg-[#3B82F6]/15 rounded-full blur-3xl" />
-            {/* Stars decoration */}
             {[...Array(6)].map((_, i) => (
               <div key={i}
                 className="absolute w-1 h-1 rounded-full bg-white/40 animate-pulse"
                 style={{ top: `${15 + i * 12}%`, left: `${8 + i * 14}%`, animationDelay: `${i * 0.3}s` }}
               />
             ))}
-
             <div className="relative z-10">
               <p className="text-xs font-semibold text-[#60A5FA] tracking-widest uppercase mb-3"
                 style={{ fontFamily: "'Outfit', sans-serif" }}>
@@ -451,6 +516,21 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Specs Modal (triggered by hero HUD) */}
+      <SpecsModal
+        isOpen={specsOpen}
+        onClose={() => setSpecsOpen(false)}
+        product={
+          activeShowcase === "gan-charger"
+            ? { id: "gan-charger", name: "GaN Charger", category: "Wall Charger", technology: "GaN V Fast-Charging Engine" }
+            : activeShowcase === "braided-cable"
+            ? { id: "braided-cable", name: "Braided Cable", category: "Cables", technology: "240W Super Duplex Kevlar" }
+            : activeShowcase === "charging-pad"
+            ? { id: "charging-pad", name: "Wireless Pad", category: "Wireless Charging", technology: "Qi2 AuraCool" }
+            : { id: "power-bank", name: "Power Bank", category: "Power Banks", technology: "140W GaN ActiveShield" }
+        }
+      />
     </div>
   );
 }
