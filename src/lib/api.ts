@@ -1,4 +1,4 @@
-const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:3001/api";
+const API_BASE = "https://accessories-by-cj.onrender.com/api";
 
 // ─── Auth helpers ─────────────────────────────────────────────────────────────
 export function getAdminToken(): string | null {
