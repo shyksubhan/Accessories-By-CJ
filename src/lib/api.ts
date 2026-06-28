@@ -1,4 +1,4 @@
-const API_BASE = "https://accessories-by-cj.onrender.com/api";
+const API_BASE = "/api";
 
 // ─── Auth helpers ─────────────────────────────────────────────────────────────
 export function getAdminToken(): string | null {
