@@ -87,26 +87,26 @@ export default function AdminWarranty() {
 
       <div className="flex flex-col sm:flex-row gap-3 mb-5">
         <form onSubmit={handleSearch} className="flex-1 relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#A0A0A5]" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8]" />
           <input
             value={search} onChange={(e) => setSearch(e.target.value)}
             placeholder="Search claims..."
-            className="w-full pl-9 pr-4 py-2.5 text-sm rounded-xl border border-[#E5E0D5] bg-white focus:outline-none focus:border-[#C8963E]"
+            className="w-full pl-9 pr-4 py-2.5 text-sm rounded-xl border border-blue-100 bg-white focus:outline-none focus:border-[#1A56DB]"
           />
         </form>
         <div className="relative">
-          <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#A0A0A5]" />
+          <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8]" />
           <select
             value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}
-            className="pl-9 pr-8 py-2.5 text-sm rounded-xl border border-[#E5E0D5] bg-white appearance-none focus:outline-none focus:border-[#C8963E] cursor-pointer"
+            className="pl-9 pr-8 py-2.5 text-sm rounded-xl border border-blue-100 bg-white appearance-none focus:outline-none focus:border-[#1A56DB] cursor-pointer"
           >
             {STATUSES.map((s) => (
               <option key={s} value={s}>{s === "all" ? "All Statuses" : STATUS_CONFIG[s]?.label || s}</option>
             ))}
           </select>
-          <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-[#A0A0A5] pointer-events-none" />
+          <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-[#94A3B8] pointer-events-none" />
         </div>
-        <button onClick={fetchClaims} className="flex items-center gap-2 px-4 py-2.5 text-sm rounded-xl border border-[#E5E0D5] bg-white hover:bg-[#F5F0E8] transition-colors text-[#6B6B70]">
+        <button onClick={fetchClaims} className="flex items-center gap-2 px-4 py-2.5 text-sm rounded-xl border border-blue-100 bg-white hover:bg-[#EFF6FF] transition-colors text-[#475569]">
           <RefreshCw className="w-3.5 h-3.5" />
         </button>
       </div>
@@ -119,40 +119,40 @@ export default function AdminWarranty() {
 
       {loading ? (
         <div className="flex items-center justify-center h-48">
-          <div className="w-7 h-7 border-2 border-[#C8963E] border-t-transparent rounded-full animate-spin" />
+          <div className="w-7 h-7 border-2 border-[#1A56DB] border-t-transparent rounded-full animate-spin" />
         </div>
       ) : filtered.length === 0 ? (
-        <div className="bg-white rounded-2xl border border-[#E5E0D5] flex flex-col items-center justify-center py-20 gap-3">
-          <Shield className="w-12 h-12 text-[#D4C9B5]" />
-          <p className="text-[#6B6B70] font-medium">No warranty claims found</p>
+        <div className="bg-white rounded-2xl border border-blue-100 flex flex-col items-center justify-center py-20 gap-3">
+          <Shield className="w-12 h-12 text-[#BFDBFE]" />
+          <p className="text-[#475569] font-medium">No warranty claims found</p>
         </div>
       ) : (
-        <div className="bg-white rounded-2xl border border-[#E5E0D5] shadow-sm overflow-hidden">
+        <div className="bg-white rounded-2xl border border-blue-100 shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="bg-[#F9F7F2] border-b border-[#E5E0D5]">
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-[#6B6B70] uppercase tracking-wide">Claim #</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-[#6B6B70] uppercase tracking-wide">Customer</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-[#6B6B70] uppercase tracking-wide hidden md:table-cell">Product</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-[#6B6B70] uppercase tracking-wide">Status</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-[#6B6B70] uppercase tracking-wide">Actions</th>
+                <tr className="bg-[#F8FAFC] border-b border-blue-100">
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-[#475569] uppercase tracking-wide">Claim #</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-[#475569] uppercase tracking-wide">Customer</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-[#475569] uppercase tracking-wide hidden md:table-cell">Product</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-[#475569] uppercase tracking-wide">Status</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-[#475569] uppercase tracking-wide">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#F0EBE0]">
+              <tbody className="divide-y divide-blue-50">
                 {filtered.map((claim) => (
-                  <tr key={claim.id} className="hover:bg-[#FAFAF8] transition-colors">
+                  <tr key={claim.id} className="hover:bg-[#F8FAFC] transition-colors">
                     <td className="px-4 py-3">
-                      <p className="font-semibold text-[#1C1C1E]">#{claim.claimNumber}</p>
-                      <p className="text-xs text-[#A0A0A5]">{new Date(claim.createdAt).toLocaleDateString("en-PK")}</p>
+                      <p className="font-semibold text-[#0F1629]">#{claim.claimNumber}</p>
+                      <p className="text-xs text-[#94A3B8]">{new Date(claim.createdAt).toLocaleDateString("en-PK")}</p>
                     </td>
                     <td className="px-4 py-3">
-                      <p className="font-medium text-[#1C1C1E]">{claim.customer.fullName}</p>
-                      <p className="text-xs text-[#A0A0A5]">{claim.customer.phone}</p>
+                      <p className="font-medium text-[#0F1629]">{claim.customer.fullName}</p>
+                      <p className="text-xs text-[#94A3B8]">{claim.customer.phone}</p>
                     </td>
                     <td className="px-4 py-3 hidden md:table-cell">
                       <p className="text-[#4A4A50]">{claim.product.name}</p>
-                      <p className="text-xs text-[#A0A0A5]">{claim.product.category}</p>
+                      <p className="text-xs text-[#94A3B8]">{claim.product.category}</p>
                     </td>
                     <td className="px-4 py-3">
                       <div className="relative inline-block">
@@ -172,13 +172,13 @@ export default function AdminWarranty() {
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
-                        <button onClick={() => openClaim(claim)} className="flex items-center gap-1 text-xs text-[#C8963E] hover:underline font-medium">
+                        <button onClick={() => openClaim(claim)} className="flex items-center gap-1 text-xs text-[#1A56DB] hover:underline font-medium">
                           <Eye className="w-3 h-3" /> View
                         </button>
                         <button
                           onClick={() => handleDelete(claim.id)}
                           disabled={deletingId === claim.id}
-                          className="p-1.5 rounded-lg text-[#6B6B70] hover:bg-red-50 hover:text-red-500 transition-colors"
+                          className="p-1.5 rounded-lg text-[#475569] hover:bg-red-50 hover:text-red-500 transition-colors"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
@@ -189,8 +189,8 @@ export default function AdminWarranty() {
               </tbody>
             </table>
           </div>
-          <div className="px-4 py-3 bg-[#F9F7F2] border-t border-[#E5E0D5]">
-            <p className="text-xs text-[#A0A0A5]">{filtered.length} claim{filtered.length !== 1 ? "s" : ""}</p>
+          <div className="px-4 py-3 bg-[#F8FAFC] border-t border-blue-100">
+            <p className="text-xs text-[#94A3B8]">{filtered.length} claim{filtered.length !== 1 ? "s" : ""}</p>
           </div>
         </div>
       )}
@@ -199,10 +199,10 @@ export default function AdminWarranty() {
       {selected && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" onClick={() => setSelected(null)}>
           <div className="bg-white rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl" onClick={(e) => e.stopPropagation()}>
-            <div className="p-5 border-b border-[#E5E0D5] flex items-center justify-between">
+            <div className="p-5 border-b border-blue-100 flex items-center justify-between">
               <div>
-                <h2 className="font-semibold text-[#1C1C1E]">Claim #{selected.claimNumber}</h2>
-                <p className="text-xs text-[#A0A0A5]">{new Date(selected.createdAt).toLocaleString("en-PK")}</p>
+                <h2 className="font-semibold text-[#0F1629]" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>Claim #{selected.claimNumber}</h2>
+                <p className="text-xs text-[#94A3B8]">{new Date(selected.createdAt).toLocaleString("en-PK")}</p>
               </div>
               <span className="text-xs font-medium px-2 py-1 rounded-full"
                 style={{ color: STATUS_CONFIG[selected.status]?.color, background: STATUS_CONFIG[selected.status]?.bg }}>
@@ -212,54 +212,54 @@ export default function AdminWarranty() {
 
             <div className="p-5 space-y-4 text-sm">
               <div>
-                <p className="text-xs font-semibold text-[#A0A0A5] uppercase tracking-wide mb-2">Customer</p>
-                <p className="font-medium text-[#1C1C1E]">{selected.customer.fullName}</p>
-                <p className="text-[#6B6B70]">{selected.customer.phone}</p>
-                {selected.customer.email && <p className="text-[#6B6B70]">{selected.customer.email}</p>}
-                {selected.customer.orderNumber && <p className="text-[#6B6B70]">Order: #{selected.customer.orderNumber}</p>}
+                <p className="text-xs font-semibold text-[#94A3B8] uppercase tracking-wide mb-2">Customer</p>
+                <p className="font-medium text-[#0F1629]">{selected.customer.fullName}</p>
+                <p className="text-[#475569]">{selected.customer.phone}</p>
+                {selected.customer.email && <p className="text-[#475569]">{selected.customer.email}</p>}
+                {selected.customer.orderNumber && <p className="text-[#475569]">Order: #{selected.customer.orderNumber}</p>}
               </div>
 
               <div>
-                <p className="text-xs font-semibold text-[#A0A0A5] uppercase tracking-wide mb-2">Product</p>
-                <p className="font-medium text-[#1C1C1E]">{selected.product.name}</p>
-                <p className="text-[#6B6B70]">{selected.product.category} · Purchased: {selected.product.purchaseDate}</p>
+                <p className="text-xs font-semibold text-[#94A3B8] uppercase tracking-wide mb-2">Product</p>
+                <p className="font-medium text-[#0F1629]">{selected.product.name}</p>
+                <p className="text-[#475569]">{selected.product.category} · Purchased: {selected.product.purchaseDate}</p>
               </div>
 
               <div>
-                <p className="text-xs font-semibold text-[#A0A0A5] uppercase tracking-wide mb-2">Issue Description</p>
-                <div className="bg-[#F9F7F2] rounded-xl p-3 text-[#4A4A50] leading-relaxed whitespace-pre-wrap">{selected.issueDesc}</div>
+                <p className="text-xs font-semibold text-[#94A3B8] uppercase tracking-wide mb-2">Issue Description</p>
+                <div className="bg-[#F8FAFC] rounded-xl p-3 text-[#4A4A50] leading-relaxed whitespace-pre-wrap">{selected.issueDesc}</div>
               </div>
 
               {selected.imagePath && (
                 <div>
-                  <p className="text-xs font-semibold text-[#A0A0A5] uppercase tracking-wide mb-2">Attached Photo</p>
+                  <p className="text-xs font-semibold text-[#94A3B8] uppercase tracking-wide mb-2">Attached Photo</p>
                   <a href={`${BACKEND}${selected.imagePath}`} target="_blank" rel="noopener noreferrer">
                     <img
                       src={`${BACKEND}${selected.imagePath}`}
                       alt="Warranty claim photo"
-                      className="w-full max-h-48 object-contain rounded-xl border border-[#E5E0D5] hover:opacity-90 transition-opacity cursor-zoom-in"
+                      className="w-full max-h-48 object-contain rounded-xl border border-blue-100 hover:opacity-90 transition-opacity cursor-zoom-in"
                     />
                   </a>
                 </div>
               )}
 
               <div>
-                <p className="text-xs font-semibold text-[#A0A0A5] uppercase tracking-wide mb-2">Admin Notes</p>
+                <p className="text-xs font-semibold text-[#94A3B8] uppercase tracking-wide mb-2">Admin Notes</p>
                 <textarea
                   value={adminNotes}
                   onChange={(e) => setAdminNotes(e.target.value)}
                   rows={3}
                   placeholder="Add internal notes about this claim..."
-                  className="w-full border border-[#E5E0D5] rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-[#C8963E] resize-none"
+                  className="w-full border border-blue-100 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-[#1A56DB] resize-none"
                 />
               </div>
 
               <div>
-                <p className="text-xs font-semibold text-[#A0A0A5] uppercase tracking-wide mb-2">Update Status</p>
+                <p className="text-xs font-semibold text-[#94A3B8] uppercase tracking-wide mb-2">Update Status</p>
                 <select
                   value={selected.status}
                   onChange={(e) => handleStatusChange(selected.id, e.target.value, adminNotes)}
-                  className="w-full border border-[#E5E0D5] rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-[#C8963E]"
+                  className="w-full border border-blue-100 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-[#1A56DB]"
                 >
                   {STATUSES.filter((s) => s !== "all").map((s) => (
                     <option key={s} value={s}>{STATUS_CONFIG[s]?.label || s}</option>
@@ -268,15 +268,15 @@ export default function AdminWarranty() {
               </div>
             </div>
 
-            <div className="p-5 border-t border-[#E5E0D5] flex gap-3">
+            <div className="p-5 border-t border-blue-100 flex gap-3">
               <button
                 onClick={() => handleStatusChange(selected.id, selected.status, adminNotes)}
                 disabled={updatingId === selected.id}
-                className="flex-1 bg-[#C8963E] hover:bg-[#B8862E] text-white font-medium py-2.5 rounded-xl transition-colors text-sm disabled:opacity-60"
+                className="flex-1 bg-[#1A56DB] hover:bg-[#1648C0] text-white font-medium py-2.5 rounded-xl transition-colors text-sm disabled:opacity-60"
               >
                 {updatingId === selected.id ? "Saving..." : "Save Notes & Status"}
               </button>
-              <button onClick={() => setSelected(null)} className="flex-1 bg-[#F5F0E8] hover:bg-[#EDE8DC] text-[#1C1C1E] font-medium py-2.5 rounded-xl transition-colors text-sm">
+              <button onClick={() => setSelected(null)} className="flex-1 bg-[#EFF6FF] hover:bg-[#DBEAFE] text-[#0F1629] font-medium py-2.5 rounded-xl transition-colors text-sm">
                 Close
               </button>
             </div>

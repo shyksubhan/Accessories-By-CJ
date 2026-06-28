@@ -1,251 +1,451 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, ChevronRight, Zap, Shield, Star } from "lucide-react";
+import { ArrowRight, ChevronRight, Shield, Truck, RefreshCw, Headphones, Zap, Star } from "lucide-react";
 import ProductCard from "@/components/ProductCard";
 import { productsApi, type ApiProduct } from "@/lib/api";
-import { formatPrice } from "@/data/products";
 
-const categoryIcons: Record<string, string> = {
-  Chargers: "🔌",
-  Cables: "🔗",
-  "Power Banks": "🔋",
-  Earbuds: "🎧",
-  Cases: "📱",
-};
+/* ─── Category data ─── */
+const CATS = [
+  { label: "Chargers",    emoji: "⚡", desc: "Fast & GaN charging" },
+  { label: "Cables",      emoji: "🔗", desc: "Durable braided cables" },
+  { label: "Power Banks", emoji: "🔋", desc: "Power on the go" },
+  { label: "Earbuds",     emoji: "🎧", desc: "Crystal clear sound" },
+  { label: "Cases",       emoji: "📱", desc: "Ultimate protection" },
+];
 
-const categories = ["Chargers", "Cables", "Power Banks", "Earbuds", "Cases"];
+/* ─── Counter animation hook ─── */
+function useCountUp(target: number, duration = 1200) {
+  const [count, setCount] = useState(0);
+  const ref = useRef<HTMLDivElement | null>(null);
+  const started = useRef(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting && !started.current) {
+        started.current = true;
+        const start = performance.now();
+        const tick = (now: number) => {
+          const p = Math.min((now - start) / duration, 1);
+          setCount(Math.floor(p * target));
+          if (p < 1) requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+      }
+    }, { threshold: 0.5 });
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [target, duration]);
+  return { count, ref };
+}
+
+function StatNumber({ value, suffix = "", label }: { value: number; suffix?: string; label: string }) {
+  const { count, ref } = useCountUp(value);
+  return (
+    <div ref={ref} className="text-center">
+      <p className="text-4xl font-bold text-white" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+        {count.toLocaleString()}{suffix}
+      </p>
+      <p className="text-sm text-white/60 mt-1">{label}</p>
+    </div>
+  );
+}
 
 export default function Home() {
   const [featuredProducts, setFeaturedProducts] = useState<ApiProduct[]>([]);
+  const [loadingProducts, setLoadingProducts] = useState(true);
 
   useEffect(() => {
-    productsApi.getAll().then((all) => {
-      const featured = all.filter((p) => p.badge === "Best Seller" || p.badge === "Premium").slice(0, 4);
-      setFeaturedProducts(featured);
-    }).catch(() => {});
+    productsApi.getAll()
+      .then((all) => {
+        // Show first 4 products regardless of badge
+        setFeaturedProducts(all.slice(0, 4));
+      })
+      .catch(() => {})
+      .finally(() => setLoadingProducts(false));
   }, []);
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* ─── Hero Section ─── */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-white via-[#EFF6FF] to-[#DBEAFE]/60">
-        {/* Background decorative blobs */}
-        <div className="absolute top-20 left-10 w-72 h-72 bg-[#1A56DB]/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-20 right-10 w-96 h-96 bg-[#3B82F6]/8 rounded-full blur-3xl" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#1A56DB]/3 rounded-full blur-3xl" />
-
-        {/* Floating particles */}
-        {[...Array(8)].map((_, i) => (
-          <div
-            key={i}
-            className="absolute w-2 h-2 rounded-full bg-[#1A56DB]/30 animate-float-particle"
+    <div className="min-h-screen bg-white overflow-x-hidden">
+      {/* ══════════════════════════════════════════════
+          HERO — Split Layout with 3D card stack
+      ══════════════════════════════════════════════ */}
+      <section className="relative min-h-screen flex items-center bg-[#020817]">
+        {/* Mesh gradient */}
+        <div className="absolute inset-0">
+          <div className="absolute top-0 left-0 w-full h-full opacity-60"
             style={{
-              left: `${10 + i * 12}%`,
-              top: `${20 + (i % 3) * 25}%`,
-              animationDelay: `${i * 0.5}s`,
-              animationDuration: `${3 + i * 0.4}s`,
+              background: "radial-gradient(ellipse 80% 60% at 20% 30%, rgba(26,86,219,0.35) 0%, transparent 70%)",
             }}
           />
-        ))}
-
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          {/* Animated badge */}
+          <div className="absolute top-0 right-0 w-full h-full opacity-40"
+            style={{
+              background: "radial-gradient(ellipse 60% 50% at 80% 70%, rgba(59,130,246,0.2) 0%, transparent 70%)",
+            }}
+          />
+          {/* Dot grid */}
           <div
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#1A56DB]/10 border border-[#1A56DB]/20 mb-8 animate-slide-up"
-            style={{ animationDelay: "0.1s" }}
-          >
-            <span className="w-2 h-2 rounded-full bg-[#1A56DB] animate-pulse" />
-            <span
-              className="text-xs font-semibold text-[#1A56DB] tracking-widest uppercase"
-              style={{ fontFamily: "'Outfit', sans-serif" }}
-            >
-              Style Meets Performance
-            </span>
-          </div>
+            className="absolute inset-0 opacity-[0.07]"
+            style={{
+              backgroundImage: "radial-gradient(circle, #ffffff 1px, transparent 1px)",
+              backgroundSize: "32px 32px",
+            }}
+          />
+        </div>
 
-          {/* Central logo animation */}
-          <div className="relative w-52 h-52 md:w-64 md:h-64 mx-auto mb-8 animate-slide-up" style={{ animationDelay: "0.2s" }}>
-            {/* Outer spinning ring */}
-            <div className="absolute inset-0 rounded-full border-2 border-dashed border-[#1A56DB]/20 animate-spin-slow" />
-            {/* Middle pulsing ring */}
-            <div className="absolute inset-4 rounded-full border border-[#1A56DB]/15 animate-pulse-ring" />
-            {/* Inner ring */}
-            <div className="absolute inset-8 rounded-full border-2 border-[#1A56DB]/30 animate-spin-reverse" />
-            {/* Glow */}
-            <div className="absolute inset-10 rounded-full bg-gradient-to-br from-[#1A56DB]/10 to-[#3B82F6]/5 blur-md" />
-            {/* Logo */}
-            <div className="absolute inset-0 flex items-center justify-center animate-logo-float">
-              <img
-                src="/logo.png"
-                alt="Accessories By CJ"
-                className="w-36 h-36 md:w-44 md:h-44 object-contain drop-shadow-[0_8px_24px_rgba(26,86,219,0.2)]"
-              />
-            </div>
-            {/* Corner sparkles */}
-            {[0, 90, 180, 270].map((deg, i) => (
-              <div
-                key={deg}
-                className="absolute w-3 h-3 rounded-full bg-[#1A56DB] animate-pulse"
-                style={{
-                  top: "50%",
-                  left: "50%",
-                  transform: `rotate(${deg}deg) translateX(100px) translateY(-50%)`,
-                  animationDelay: `${i * 0.5}s`,
-                  opacity: 0.6,
-                }}
-              />
-            ))}
-          </div>
-
-          {/* Heading */}
-          <div className="animate-slide-up" style={{ animationDelay: "0.3s" }}>
-            <h1
-              className="text-5xl md:text-6xl lg:text-7xl font-bold text-[#0F1629] leading-tight mb-2"
-              style={{ fontFamily: "'Space Grotesk', sans-serif" }}
-            >
-              Accessories
-            </h1>
-            <h1
-              className="text-5xl md:text-6xl lg:text-7xl font-bold text-gradient leading-tight mb-6"
-              style={{ fontFamily: "'Space Grotesk', sans-serif" }}
-            >
-              by CJ
-            </h1>
-          </div>
-
-          {/* Subtitle */}
-          <p
-            className="text-lg md:text-xl text-[#475569] max-w-2xl mx-auto mb-10 leading-relaxed animate-slide-up"
-            style={{ animationDelay: "0.4s", fontFamily: "'Inter', sans-serif" }}
-          >
-            Premium mobile accessories — chargers, cables, power banks, earbuds & cases —
-            designed where <span className="text-[#1A56DB] font-semibold">style meets performance</span>.
-          </p>
-
-          {/* CTA Buttons */}
-          <div
-            className="flex gap-4 flex-wrap justify-center animate-slide-up"
-            style={{ animationDelay: "0.5s" }}
-          >
-            <Link
-              to="/products"
-              className="btn-primary inline-flex items-center gap-2 text-base px-8 py-4"
-            >
-              Shop Now
-              <ArrowRight className="w-5 h-5" />
-            </Link>
-            <Link
-              to="/about"
-              className="btn-outline inline-flex items-center gap-2 text-base px-8 py-4"
-            >
-              Our Story
-            </Link>
-          </div>
-
-          {/* Trust indicators */}
-          <div
-            className="flex items-center justify-center gap-8 mt-12 animate-slide-up"
-            style={{ animationDelay: "0.6s" }}
-          >
-            {[
-              { icon: Zap, text: "Fast Delivery" },
-              { icon: Shield, text: "Warranty Covered" },
-              { icon: Star, text: "Premium Quality" },
-            ].map((item) => (
-              <div key={item.text} className="flex items-center gap-2 text-sm text-[#64748B]">
-                <item.icon className="w-4 h-4 text-[#1A56DB]" />
-                <span style={{ fontFamily: "'Outfit', sans-serif" }}>{item.text}</span>
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full py-24 lg:py-32">
+          <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+            {/* Left — Text */}
+            <div>
+              {/* Pill badge */}
+              <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur border border-white/15 rounded-full px-4 py-1.5 mb-6">
+                <span className="w-2 h-2 rounded-full bg-[#60A5FA] animate-pulse" />
+                <span className="text-xs font-semibold text-white/80 tracking-widest uppercase"
+                  style={{ fontFamily: "'Outfit', sans-serif" }}>
+                  Style Meets Performance
+                </span>
               </div>
-            ))}
+
+              <h1 className="text-5xl md:text-6xl xl:text-7xl font-bold text-white leading-[1.05] mb-6"
+                style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+                Premium
+                <span className="block bg-gradient-to-r from-[#60A5FA] via-[#818CF8] to-[#60A5FA] bg-clip-text text-transparent">
+                  Accessories
+                </span>
+                <span className="block text-white">by CJ</span>
+              </h1>
+
+              <p className="text-lg text-white/60 leading-relaxed mb-8 max-w-lg"
+                style={{ fontFamily: "'Inter', sans-serif" }}>
+                Elevate your device with chargers, cables, power banks, earbuds & cases — built to perform,
+                designed to impress.
+              </p>
+
+              <div className="flex gap-4 flex-wrap">
+                <Link to="/products"
+                  className="inline-flex items-center gap-2 bg-[#1A56DB] hover:bg-[#1345b8] text-white font-semibold px-7 py-3.5 rounded-xl shadow-[0_8px_24px_rgba(26,86,219,0.45)] hover:shadow-[0_12px_32px_rgba(26,86,219,0.55)] transition-all duration-300 hover:-translate-y-0.5"
+                  style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+                  Shop Now <ArrowRight className="w-4 h-4" />
+                </Link>
+                <Link to="/about"
+                  className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/15 border border-white/20 text-white font-medium px-7 py-3.5 rounded-xl transition-all duration-300 backdrop-blur"
+                  style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+                  Our Story
+                </Link>
+              </div>
+
+              {/* Trust row */}
+              <div className="flex gap-6 mt-10">
+                {[
+                  { icon: Truck, label: "Fast Delivery" },
+                  { icon: Shield, label: "3M Warranty" },
+                  { icon: RefreshCw, label: "7-Day Returns" },
+                ].map((t) => (
+                  <div key={t.label} className="flex items-center gap-2">
+                    <t.icon className="w-4 h-4 text-[#60A5FA]" />
+                    <span className="text-xs text-white/60" style={{ fontFamily: "'Outfit', sans-serif" }}>
+                      {t.label}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Right — Logo + floating cards */}
+            <div className="relative flex items-center justify-center">
+              {/* Outer glow ring */}
+              <div className="absolute w-72 h-72 rounded-full bg-[#1A56DB]/20 blur-3xl animate-pulse" />
+
+              {/* Spinning dashed ring */}
+              <div className="absolute w-64 h-64 rounded-full border-2 border-dashed border-[#1A56DB]/30 animate-spin-slow" />
+              <div className="absolute w-52 h-52 rounded-full border border-[#60A5FA]/20 animate-spin-reverse" />
+
+              {/* Center logo */}
+              <div className="relative z-10 w-44 h-44 rounded-3xl bg-white/8 backdrop-blur-xl border border-white/15 flex items-center justify-center shadow-[0_24px_64px_rgba(0,0,0,0.4)] animate-logo-float">
+                <img
+                  src="/logo.png"
+                  alt="Accessories By CJ"
+                  className="w-32 h-32 object-contain drop-shadow-2xl"
+                />
+              </div>
+
+              {/* Floating feature cards */}
+              <div className="absolute -top-4 -left-8 bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl px-4 py-3 shadow-xl animate-float-1">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-xl bg-[#1A56DB] flex items-center justify-center">
+                    <Zap className="w-4 h-4 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-white">65W GaN</p>
+                    <p className="text-[10px] text-white/50">Fast Charging</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="absolute -bottom-4 -right-8 bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl px-4 py-3 shadow-xl animate-float-2">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-xl bg-[#10B981] flex items-center justify-center">
+                    <Star className="w-4 h-4 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-white">Premium</p>
+                    <p className="text-[10px] text-white/50">Quality Tested</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="absolute top-1/2 -right-12 -translate-y-1/2 bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl px-4 py-3 shadow-xl animate-float-1" style={{ animationDelay: "0.5s" }}>
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-xl bg-[#8B5CF6] flex items-center justify-center">
+                    <Headphones className="w-4 h-4 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-white">ANC</p>
+                    <p className="text-[10px] text-white/50">Earbuds</p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
         {/* Bottom wave */}
         <div className="absolute bottom-0 left-0 right-0">
-          <svg viewBox="0 0 1440 60" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M0,30 C360,60 1080,0 1440,30 L1440,60 L0,60 Z" fill="white" />
+          <svg viewBox="0 0 1440 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M0,40 C480,80 960,0 1440,40 L1440,80 L0,80 Z" fill="white" />
           </svg>
         </div>
       </section>
 
-      {/* ─── Categories Section ─── */}
-      <section className="py-16 md:py-20 bg-white">
+      {/* ══════════════════════════════════════════════
+          STATS STRIP
+      ══════════════════════════════════════════════ */}
+      <section className="bg-gradient-to-r from-[#0F1629] via-[#1A2744] to-[#0F1629] py-14">
+        <div className="max-w-4xl mx-auto px-4 grid grid-cols-2 sm:grid-cols-4 gap-8">
+          <StatNumber value={500}  suffix="+" label="Happy Customers" />
+          <StatNumber value={100}  suffix="%"  label="Quality Tested" />
+          <StatNumber value={3}    suffix=" Mo" label="Warranty Coverage" />
+          <StatNumber value={7}    suffix=" Day" label="Easy Returns" />
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════════════
+          CATEGORIES
+      ══════════════════════════════════════════════ */}
+      <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="section-title">Shop by Category</h2>
-            <p className="section-subtitle">Find exactly what your device needs</p>
+            <p className="text-xs font-semibold text-[#1A56DB] tracking-widest uppercase mb-3"
+              style={{ fontFamily: "'Outfit', sans-serif" }}>
+              Browse
+            </p>
+            <h2 className="text-3xl md:text-4xl font-bold text-[#0F1629]"
+              style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+              Shop by Category
+            </h2>
+            <p className="text-[#64748B] mt-3 max-w-md mx-auto">
+              Find the perfect accessory for every need
+            </p>
           </div>
+
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-            {categories.map((cat) => (
+            {CATS.map((cat, i) => (
               <Link
-                key={cat}
-                to={`/products?category=${encodeURIComponent(cat)}`}
-                className="glass-card p-6 flex flex-col items-center text-center group border border-blue-50"
+                key={cat.label}
+                to={`/products?category=${encodeURIComponent(cat.label)}`}
+                className="group relative overflow-hidden rounded-2xl bg-white border border-blue-100 p-6 flex flex-col items-center text-center hover:shadow-[0_16px_40px_rgba(26,86,219,0.12)] hover:-translate-y-1 transition-all duration-300"
+                style={{ animationDelay: `${i * 0.08}s` }}
               >
-                <span className="text-4xl mb-3 group-hover:scale-110 transition-transform duration-300">
-                  {categoryIcons[cat]}
-                </span>
-                <h3
-                  className="text-sm font-semibold text-[#0F1629] group-hover:text-[#1A56DB] transition-colors"
-                  style={{ fontFamily: "'Space Grotesk', sans-serif" }}
-                >
-                  {cat}
-                </h3>
+                {/* Hover fill */}
+                <div className="absolute inset-0 bg-gradient-to-br from-[#EFF6FF] to-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
+                <div className="relative z-10">
+                  <div className="w-16 h-16 rounded-2xl bg-[#EFF6FF] group-hover:bg-[#1A56DB] flex items-center justify-center mb-4 transition-colors duration-300 shadow-sm">
+                    <span className="text-3xl group-hover:scale-110 transition-transform duration-300">
+                      {cat.emoji}
+                    </span>
+                  </div>
+                  <h3 className="text-sm font-semibold text-[#0F1629] group-hover:text-[#1A56DB] transition-colors"
+                    style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+                    {cat.label}
+                  </h3>
+                  <p className="text-xs text-[#94A3B8] mt-1">{cat.desc}</p>
+                </div>
+
+                <ChevronRight className="relative z-10 w-4 h-4 text-[#BFDBFE] group-hover:text-[#1A56DB] mt-3 group-hover:translate-x-1 transition-all duration-300" />
               </Link>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ─── Featured Products ─── */}
-      {featuredProducts.length > 0 && (
-        <section className="py-16 md:py-20 bg-gradient-to-b from-white to-[#EFF6FF]/50">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-end justify-between mb-10">
-              <div>
-                <h2 className="section-title">Featured Products</h2>
-                <p className="section-subtitle">Our most loved accessories</p>
-              </div>
-              <Link
-                to="/products"
-                className="hidden sm:inline-flex items-center gap-1.5 text-sm font-medium text-[#1A56DB] hover:text-[#1345b8] transition-colors"
-              >
-                View All <ChevronRight className="w-4 h-4" />
-              </Link>
+      {/* ══════════════════════════════════════════════
+          FEATURED PRODUCTS
+      ══════════════════════════════════════════════ */}
+      <section className="py-20 bg-gradient-to-b from-[#EFF6FF]/60 to-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-end justify-between mb-12">
+            <div>
+              <p className="text-xs font-semibold text-[#1A56DB] tracking-widest uppercase mb-3"
+                style={{ fontFamily: "'Outfit', sans-serif" }}>
+                Products
+              </p>
+              <h2 className="text-3xl md:text-4xl font-bold text-[#0F1629]"
+                style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+                Featured Products
+              </h2>
+              <p className="text-[#64748B] mt-2">Handpicked accessories, loved by customers</p>
             </div>
+            <Link
+              to="/products"
+              className="hidden sm:inline-flex items-center gap-1.5 text-sm font-semibold text-[#1A56DB] bg-[#EFF6FF] hover:bg-[#DBEAFE] px-4 py-2 rounded-xl transition-colors"
+            >
+              View All <ChevronRight className="w-4 h-4" />
+            </Link>
+          </div>
+
+          {loadingProducts ? (
+            <div className="flex items-center justify-center py-24">
+              <div className="w-10 h-10 border-2 border-[#1A56DB] border-t-transparent rounded-full animate-spin" />
+            </div>
+          ) : featuredProducts.length > 0 ? (
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {featuredProducts.map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}
             </div>
-          </div>
-        </section>
-      )}
-
-      {/* ─── CTA Banner ─── */}
-      <section className="py-16 md:py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-[#0F1629] via-[#1A2744] to-[#0F1629] p-10 md:p-16 text-center">
-            <div className="absolute top-0 right-0 w-72 h-72 bg-[#1A56DB]/15 rounded-full blur-3xl" />
-            <div className="absolute bottom-0 left-0 w-56 h-56 bg-[#3B82F6]/10 rounded-full blur-3xl" />
-            <div className="relative">
-              <h2
-                className="text-3xl md:text-4xl font-bold text-white mb-4"
-                style={{ fontFamily: "'Space Grotesk', sans-serif" }}
-              >
-                Need Help Choosing?
-              </h2>
-              <p className="text-[#94A3B8] max-w-md mx-auto mb-8 leading-relaxed">
-                Our team is here to help you find the perfect accessory for your device. Reach out anytime on WhatsApp.
+          ) : (
+            <div className="text-center py-20 bg-white rounded-3xl border border-blue-100">
+              <span className="text-6xl mb-4 block">🛍️</span>
+              <h3 className="text-xl font-semibold text-[#0F1629] mb-2"
+                style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+                Products Coming Soon
+              </h3>
+              <p className="text-[#64748B] max-w-sm mx-auto mb-6">
+                We're stocking up our store with premium accessories. Chat with us on WhatsApp in the meantime.
               </p>
               <a
                 href="https://wa.me/923120141004"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 bg-[#25D366] text-white px-8 py-3.5 rounded-xl font-medium shadow-[0_8px_24px_rgba(37,211,102,0.3)] hover:shadow-[0_12px_32px_rgba(37,211,102,0.4)] hover:-translate-y-0.5 transition-all duration-300"
+                className="inline-flex items-center gap-2 bg-[#25D366] text-white px-6 py-3 rounded-xl font-medium hover:-translate-y-0.5 transition-all duration-300 shadow-[0_4px_12px_rgba(37,211,102,0.3)]"
               >
                 Chat on WhatsApp
-                <ArrowRight className="w-4 h-4" />
+              </a>
+            </div>
+          )}
+
+          <div className="text-center mt-8 sm:hidden">
+            <Link to="/products" className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#1A56DB] bg-[#EFF6FF] hover:bg-[#DBEAFE] px-5 py-2.5 rounded-xl transition-colors">
+              View All Products <ChevronRight className="w-4 h-4" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════════════
+          WHY CHOOSE US — Bento Grid
+      ══════════════════════════════════════════════ */}
+      <section className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <p className="text-xs font-semibold text-[#1A56DB] tracking-widest uppercase mb-3"
+              style={{ fontFamily: "'Outfit', sans-serif" }}>
+              Why Us
+            </p>
+            <h2 className="text-3xl md:text-4xl font-bold text-[#0F1629]"
+              style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+              The CJ Advantage
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {[
+              {
+                icon: "⚡",
+                title: "Fast Nationwide Delivery",
+                desc: "Lahore: 1–2 days. Rest of Pakistan: 2–5 days.",
+                color: "from-[#EFF6FF] to-[#DBEAFE]",
+                accent: "#1A56DB",
+              },
+              {
+                icon: "🛡️",
+                title: "3-Month Warranty",
+                desc: "All sealed accessories covered for manufacturing defects.",
+                color: "from-[#F0FDF4] to-[#DCFCE7]",
+                accent: "#16a34a",
+              },
+              {
+                icon: "↩️",
+                title: "7-Day Easy Returns",
+                desc: "Not happy? Return it hassle-free within 7 days.",
+                color: "from-[#FFF7ED] to-[#FED7AA]",
+                accent: "#ea580c",
+              },
+              {
+                icon: "💬",
+                title: "WhatsApp Support",
+                desc: "Real humans, real answers — chat us anytime.",
+                color: "from-[#F5F3FF] to-[#EDE9FE]",
+                accent: "#7c3aed",
+              },
+            ].map((card) => (
+              <div
+                key={card.title}
+                className={`bg-gradient-to-br ${card.color} rounded-2xl p-6 border border-white hover:shadow-lg hover:-translate-y-1 transition-all duration-300`}
+              >
+                <span className="text-4xl mb-4 block">{card.icon}</span>
+                <h3 className="text-base font-semibold text-[#0F1629] mb-2"
+                  style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+                  {card.title}
+                </h3>
+                <p className="text-sm text-[#64748B] leading-relaxed">{card.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════════════
+          CTA BANNER
+      ══════════════════════════════════════════════ */}
+      <section className="py-20 bg-[#EFF6FF]/50">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-[#020817] via-[#0F1629] to-[#1A2744] text-center px-8 py-16">
+            {/* Decorative blobs */}
+            <div className="absolute -top-16 -left-16 w-64 h-64 bg-[#1A56DB]/20 rounded-full blur-3xl" />
+            <div className="absolute -bottom-16 -right-16 w-64 h-64 bg-[#3B82F6]/15 rounded-full blur-3xl" />
+            {/* Stars decoration */}
+            {[...Array(6)].map((_, i) => (
+              <div key={i}
+                className="absolute w-1 h-1 rounded-full bg-white/40 animate-pulse"
+                style={{ top: `${15 + i * 12}%`, left: `${8 + i * 14}%`, animationDelay: `${i * 0.3}s` }}
+              />
+            ))}
+
+            <div className="relative z-10">
+              <p className="text-xs font-semibold text-[#60A5FA] tracking-widest uppercase mb-3"
+                style={{ fontFamily: "'Outfit', sans-serif" }}>
+                Get In Touch
+              </p>
+              <h2 className="text-3xl md:text-4xl font-bold text-white mb-4"
+                style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+                Need Help Choosing<br />the Right Accessory?
+              </h2>
+              <p className="text-white/50 max-w-sm mx-auto mb-8 leading-relaxed">
+                Our team is always here to guide you to the perfect product for your device.
+              </p>
+              <a
+                href="https://wa.me/923120141004"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2.5 bg-[#25D366] hover:bg-[#1ea855] text-white font-semibold px-8 py-4 rounded-xl shadow-[0_8px_28px_rgba(37,211,102,0.35)] hover:shadow-[0_12px_36px_rgba(37,211,102,0.45)] transition-all duration-300 hover:-translate-y-0.5"
+                style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+              >
+                <svg viewBox="0 0 24 24" className="w-5 h-5 fill-white">
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+                </svg>
+                Chat on WhatsApp
               </a>
             </div>
           </div>
