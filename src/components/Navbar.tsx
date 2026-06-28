@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Search, ShoppingCart, Menu, X, User } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { productsApi, type ApiProduct } from "@/lib/api";
+import { CjLogoSVG } from "@/components/CjLogo";
 
 const navLinks = [
   { label: "Home", to: "/" },
@@ -58,11 +59,16 @@ export default function Navbar() {
         <div className="flex items-center justify-between h-16 md:h-20">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-3 shrink-0 group">
-            <img
-              src="/logo.png"
-              alt="Accessories By CJ"
-              className="h-10 md:h-12 w-auto object-contain group-hover:scale-105 transition-transform duration-300"
+            <CjLogoSVG
+              size={44}
+              glow={true}
+              className="group-hover:scale-105 transition-transform duration-300"
             />
+            <span
+              className="font-podium text-[#0F1629] text-xs sm:text-sm tracking-wider uppercase font-extrabold select-none hidden sm:block"
+            >
+              Accessories by CJ
+            </span>
           </Link>
 
           {/* Desktop Nav */}
@@ -176,6 +182,13 @@ export default function Navbar() {
         {/* Mobile Menu */}
         {menuOpen && (
           <div className="md:hidden pb-4 border-t border-blue-100/50 pt-3 animate-in slide-in-from-top-2 duration-300">
+            {/* Mobile Brand Logo in Menu */}
+            <div className="flex items-center gap-2 px-4 py-2 mb-2">
+              <CjLogoSVG size={32} glow={false} />
+              <span className="font-podium text-[#0F1629] text-[10px] tracking-wider uppercase font-extrabold">
+                Accessories by CJ
+              </span>
+            </div>
             <div className="flex flex-col gap-1">
               {navLinks.map((link) => (
                 <Link

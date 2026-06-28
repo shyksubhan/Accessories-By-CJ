@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700&family=Syncopate:wght@700&display=swap');
 
 @layer base {
   :root {
@@ -105,7 +105,7 @@
     @apply premium-input resize-none min-h-[120px];
   }
 
-  /* Hero particle animation */
+  /* ── Existing Hero particle animations ── */
   @keyframes float-particle {
     0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.6; }
     50% { transform: translateY(-20px) rotate(180deg); opacity: 1; }
@@ -161,6 +161,40 @@
   .animate-spin-reverse { animation: spin-reverse 18s linear infinite; }
   .animate-float-1 { animation: float-1 3s ease-in-out infinite; }
   .animate-float-2 { animation: float-2 3.5s ease-in-out infinite; }
+
+  /* ── NEW: CjLogoSVG glow & particle animations (from Design) ── */
+  @keyframes pulseGlow {
+    0%, 100% {
+      filter: drop-shadow(0 0 15px rgba(59, 130, 246, 0.4)) drop-shadow(0 0 30px rgba(59, 130, 246, 0.2));
+    }
+    50% {
+      filter: drop-shadow(0 0 30px rgba(59, 130, 246, 0.7)) drop-shadow(0 0 50px rgba(59, 130, 246, 0.4));
+    }
+  }
+
+  @keyframes energyRotate {
+    0% { transform: translate(-50%, -50%) rotate(0deg); }
+    100% { transform: translate(-50%, -50%) rotate(360deg); }
+  }
+
+  @keyframes floatParticles {
+    0%, 100% {
+      transform: translateY(0px) translateX(0px);
+      opacity: 0.2;
+    }
+    50% {
+      transform: translateY(-20px) translateX(10px);
+      opacity: 0.6;
+    }
+  }
+
+  .animate-pulse-glow { animation: pulseGlow 4s ease-in-out infinite; }
+  .animate-energy-rotate-slow { animation: energyRotate 25s linear infinite; }
+  .animate-energy-rotate-fast { animation: energyRotate 12s linear infinite reverse; }
+  .animate-particle { animation: floatParticles 6s ease-in-out infinite; }
+
+  /* Syncopate font utility (for logo brand text) */
+  .font-podium { font-family: 'Syncopate', sans-serif; }
 }
 
 /* Scrollbar */

@@ -2,9 +2,10 @@ import { useNavigate } from "react-router-dom";
 import { isAdminAuthenticated, clearAdminToken } from "@/lib/api";
 import {
   LayoutDashboard, ShoppingBag, Package, MessageSquare,
-  Shield, LogOut, Menu, ChevronRight, Zap,
+  Shield, LogOut, Menu, ChevronRight,
 } from "lucide-react";
 import { useState } from "react";
+import { CjLogoSVG } from "@/components/CjLogo";
 
 const navItems = [
   { label: "Dashboard",  path: "/admin",           icon: LayoutDashboard },
@@ -34,11 +35,9 @@ export default function AdminLayout({ children, title }: { children: React.React
       {/* Brand */}
       <div className="px-5 py-5 border-b border-white/8">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#1A56DB] to-[#3B82F6] flex items-center justify-center shadow-[0_4px_12px_rgba(26,86,219,0.4)]">
-            <Zap className="w-5 h-5 text-white" />
-          </div>
+          <CjLogoSVG size={40} glow={true} />
           <div>
-            <p className="text-white font-bold text-sm leading-none" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+            <p className="text-white font-bold text-sm leading-none font-podium tracking-wider uppercase">
               Acc-by-CJ
             </p>
             <p className="text-white/40 text-xs mt-0.5">Admin Portal</p>
