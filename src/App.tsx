@@ -18,6 +18,9 @@ import About from "@/pages/About";
 import Contact from "@/pages/Contact";
 import ShippingPolicy from "@/pages/ShippingPolicy";
 import WarrantyClaim from "@/pages/WarrantyClaim";
+import StorePolicies from "@/pages/StorePolicies";
+import UserProfile from "@/pages/UserProfile";
+import TrackOrder from "@/pages/TrackOrder";
 import NotFound from "@/pages/NotFound";
 
 // Admin pages
@@ -75,6 +78,9 @@ const App = () => (
             <Route path="/contact" element={<StoreLayout><Contact /></StoreLayout>} />
             <Route path="/shipping-policy" element={<StoreLayout><ShippingPolicy /></StoreLayout>} />
             <Route path="/warranty-claim" element={<StoreLayout><WarrantyClaim /></StoreLayout>} />
+            <Route path="/policies" element={<StoreLayout><StorePolicies /></StoreLayout>} />
+            <Route path="/profile" element={<StoreLayout><UserProfile /></StoreLayout>} />
+            <Route path="/track-order" element={<StoreLayout><TrackOrder /></StoreLayout>} />
             <Route path="*" element={<StoreLayout><NotFound /></StoreLayout>} />
           </Routes>
         </BrowserRouter>

@@ -2,12 +2,12 @@ import { Heart, Target, Star, Award } from "lucide-react";
 
 export default function About() {
   return (
-    <div className="min-h-screen pt-24 pb-16">
+    <div className="min-h-screen pt-24 pb-16 bg-white">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Hero */}
         <div className="text-center mb-16">
           <h1 className="section-title mb-3">About Accessories By CJ</h1>
-          <p className="text-xl text-[#6B6B70] font-['Playfair_Display'] italic">
+          <p className="text-xl text-[#475569] italic" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
             "Quality accessories for the modern lifestyle"
           </p>
         </div>
@@ -15,10 +15,10 @@ export default function About() {
         {/* Story */}
         <div className="grid lg:grid-cols-2 gap-12 mb-20">
           <div>
-            <h2 className="text-2xl font-semibold text-[#1C1C1E] mb-4 font-['Playfair_Display']">
+            <h2 className="text-2xl font-semibold text-[#0F1629] mb-4" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
               Our Story
             </h2>
-            <div className="space-y-4 text-[#6B6B70] leading-relaxed">
+            <div className="space-y-4 text-[#475569] leading-relaxed">
               <p>
                 Accessories By CJ was born from a simple observation: finding premium-quality mobile
                 accessories in Pakistan was harder than it should be. We saw a market flooded with
@@ -39,35 +39,37 @@ export default function About() {
           <div className="grid grid-cols-2 gap-4">
             {[
               { icon: Target, title: "Our Mission", desc: "To make premium accessories accessible to every Pakistani" },
-              { icon: Heart, title: "Our Promise", desc: "Every product backed by our 1-year warranty guarantee" },
+              { icon: Heart, title: "Our Promise", desc: "Every product backed by our warranty and quality guarantee" },
               { icon: Star, title: "Quality First", desc: "We never compromise on the quality of our products" },
-              { icon: Award, title: "Trusted", desc: "Serving 10,000+ happy customers across Pakistan" },
+              { icon: Award, title: "Trusted", desc: "Serving happy customers across Pakistan" },
             ].map((item) => (
-              <div key={item.title} className="glass-card p-5">
-                <item.icon className="w-6 h-6 text-[#C8963E] mb-3" />
-                <h3 className="font-['Playfair_Display'] text-sm font-semibold text-[#1C1C1E] mb-1">
+              <div key={item.title} className="bg-white rounded-2xl p-5 border border-blue-100 shadow-[0_4px_16px_rgba(26,86,219,0.05)] hover:shadow-[0_8px_24px_rgba(26,86,219,0.1)] hover:-translate-y-0.5 transition-all duration-300">
+                <item.icon className="w-6 h-6 text-[#1A56DB] mb-3" />
+                <h3 className="text-sm font-semibold text-[#0F1629] mb-1" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
                   {item.title}
                 </h3>
-                <p className="text-xs text-[#6B6B70] leading-relaxed">{item.desc}</p>
+                <p className="text-xs text-[#64748B] leading-relaxed">{item.desc}</p>
               </div>
             ))}
           </div>
         </div>
 
         {/* Why Choose Us */}
-        <div className="glass rounded-[2rem] p-8 md:p-12 text-center">
-          <h2 className="text-2xl font-semibold text-[#1C1C1E] mb-8 font-['Playfair_Display']">
+        <div className="bg-gradient-to-br from-[#0F1629] to-[#1A2744] rounded-[2rem] p-8 md:p-12 text-center">
+          <h2 className="text-2xl font-semibold text-white mb-8" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
             Why Choose Accessories By CJ?
           </h2>
           <div className="grid sm:grid-cols-3 gap-8">
             {[
-              { number: "10K+", label: "Happy Customers" },
               { number: "100%", label: "Quality Tested" },
               { number: "24/7", label: "WhatsApp Support" },
+              { number: "Pakistan", label: "Nationwide Delivery" },
             ].map((stat) => (
               <div key={stat.label}>
-                <p className="text-3xl font-bold text-[#C8963E] mb-1">{stat.number}</p>
-                <p className="text-sm text-[#6B6B70]">{stat.label}</p>
+                <p className="text-3xl font-bold text-[#60A5FA] mb-1" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+                  {stat.number}
+                </p>
+                <p className="text-sm text-[#94A3B8]">{stat.label}</p>
               </div>
             ))}
           </div>
